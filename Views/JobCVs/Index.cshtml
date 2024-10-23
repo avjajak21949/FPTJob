@@ -1,0 +1,52 @@
+﻿@model IEnumerable<FPTJob.Models.JobCV>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Job Applications</h1>
+
+<table class="table table-bordered">
+    <thead class="thead-dark">
+        <tr>
+            <th>Job Title</th>
+            <th>Applicant</th>
+            <th>Pending</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Job.Title</td>
+                <td>
+                    <embed src="@item.CV.file" type="application/pdf" width="200" height="200" />
+                    <a href="@item.CV.file" target="_blank">View PDF</a>
+                </td>
+                <td>
+                    @if (item.IsApproved == null)
+                    {
+                        <span class="text-warning">Chưa duyệt</span>
+                    }
+                    else if (item.IsApproved == true)
+                    {
+                        <span class="text-success">Success</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">Pending</span>
+                    }
+                </td>
+                <td>
+                        <form method="post" asp-action="ApproveCV" asp-route-jobCVID="@item.JobCVID">
+                            <button type="submit" class="btn btn-success">Chấp nhận</button>
+                        </form>
+                    <form method="post" asp-action="RejectCV" asp-route-jobCVID="@item.JobCVID" onsubmit="return confirm('Are you sure you want to reject this job?');">
+                            <button type="submit" class="btn btn-danger">Từ chối</button>
+                        </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

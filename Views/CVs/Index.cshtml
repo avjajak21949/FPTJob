@@ -1,0 +1,50 @@
+﻿@model IEnumerable<FPTJob.Models.CV>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                CV's Name
+            </th>
+            <th>
+                PDF File
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    <!-- Sử dụng embed để hiển thị PDF trong bảng -->
+                    @if (!string.IsNullOrEmpty(item.file))
+                    {
+                        <embed src="@item.file" type="application/pdf" width="200" height="200" />
+                    }
+                    else
+                    {
+                        <p>No file available</p>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.CVID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.CVID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.CVID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

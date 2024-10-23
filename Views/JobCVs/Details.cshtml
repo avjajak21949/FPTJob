@@ -1,0 +1,36 @@
+﻿@model FPTJob.Models.JobCV
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>JobCV</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.IsApproved)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.IsApproved)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Job)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Job.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CV)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CV.CVID)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.JobCVID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

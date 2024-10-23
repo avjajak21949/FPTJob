@@ -1,0 +1,85 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <form asp-route-returnUrl="@Model.ReturnUrl" method="post" class="shadow p-4 rounded bg-light">
+            <h4 class="text-center text-primary">Create a new account</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" placeholder="Email" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" type="password" class="form-control" placeholder="Password" />
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" type="password" class="form-control" placeholder="Confirm Password" />
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Select Role</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Input.Role" value="JobSeeker" id="jobSeekerRadio" />
+                    <label class="form-check-label" for="jobSeekerRadio">
+                        Job Seeker
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="Input.Role" value="Employer" id="employerRadio" />
+                    <label class="form-check-label" for="employerRadio">
+                        Employer
+                    </label>
+                </div>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="btn btn-primary w-100">Register</button>
+        </form>
+    </div>
+
+    <div class="col-md-6 mt-4">
+        <section class="shadow p-4 rounded bg-light">
+            <h4 class="text-center text-secondary">Register with another service</h4>
+            <hr />
+            @if ((Model.ExternalLogins?.Count ?? 0) == 0)
+            {
+                <div class="text-center">
+                    <p>
+                        There are no external authentication services configured. See
+                        <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
+                        for details on setting up this ASP.NET application to support external services.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal text-center">
+                    @foreach (var provider in Model.ExternalLogins)
+                    {
+                        <button type="submit" class="btn btn-outline-primary m-2" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                            @provider.DisplayName
+                        </button>
+                    }
+                </form>
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

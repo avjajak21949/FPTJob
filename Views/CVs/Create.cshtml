@@ -1,0 +1,48 @@
+﻿@model FPTJob.Models.CV
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Upload CV</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <!-- Form cần có enctype="multipart/form-data" để upload file -->
+        <form asp-controller="CVs" asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- File Upload Input -->
+            <div class="form-group">
+                <label asp-for="file" class="control-label">Select PDF File</label>
+                <!-- Sử dụng input type="file" để người dùng có thể chọn file -->
+                <!-- Accept chỉ định chỉ file PDF -->
+                <input asp-for="file" class="form-control" type="file" accept=".pdf" />
+                <span asp-validation-for="file" class="text-danger"></span>
+            </div>
+
+            <!-- Description Input -->
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">CV's' Name</label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Back to list -->
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,90 @@
+﻿@model IEnumerable<FPTJob.Models.Job>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center display-4 mb-4">Job Management</h1>
+
+    <div class="text-right mb-4">
+        <a asp-action="Create" class="btn btn-primary btn-lg shadow-lg">Create New Job</a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mb-4">
+        <form method="get" action="@Url.Action("Index")" class="form-inline">
+            <input type="text" name="searchString" class="form-control" placeholder="Search jobs..." />
+            <button type="submit" class="btn btn-secondary ml-2">Search</button>
+        </form>
+    </div>
+
+    <!-- Sort By -->
+    <div class="mb-4">
+        <label for="sortOptions" class="mr-2">Sort by:</label>
+        <select id="sortOptions" name="sortOrder" class="form-control d-inline" onchange="this.form.submit()">
+            <option value="">Select...</option>
+            <option value="title">Title</option>
+            <option value="salary">Salary</option>
+            <option value="location">Location</option>
+        </select>
+    </div>
+
+    <!-- Card layout for job management -->
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0">@item.Title</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Description: </strong>@item.Description</p>
+                        <p><strong>Salary: </strong>@item.Salary.ToString("C")</p>
+                        <p><strong>Location: </strong>@item.Place</p>
+                        <p><strong>Time: </strong>@item.Time</p>
+                        <p><strong>Category: </strong>@item.Category.Name</p>
+                        <p>
+                            <strong>Status: </strong>
+                            @if (!item.IsApproved)
+                            {
+                                <span class="badge badge-warning">Pending</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-success">Approved</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <form method="post" action="@Url.Action("ApproveJob", "Jobs")" class="d-inline">
+                            <input type="hidden" name="jobId" value="@item.Id" />
+                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                        </form>
+                        <form method="post" action="@Url.Action("RejectJob", "Jobs")" class="d-inline">
+                            <input type="hidden" name="jobId" value="@item.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                        </form>
+                    </div>
+                    <div>
+                        <form asp-action="ApplyForJob" method="post">
+                            <input type="hidden" name="jobId" value="@item.Id" />
+                            <!-- Dropdown danh sách CVs của người dùng -->
+                            <select name="cvId" required>
+                                @foreach (var cv in ViewBag.CVs)
+                                {
+                                    <option value="@cv.CVID">
+                                        <a href="@cv.file" target="_blank">@cv.Description</a> <!-- Hiển thị tên file dưới dạng liên kết -->
+                                    </option>
+                                }
+                            </select>
+
+                            <button type="submit" class="btn btn-primary">Apply</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
