@@ -1,5 +1,4 @@
-﻿Khắc Minh
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -76,7 +75,22 @@
                         <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                         <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="AboutUs">About Us</a></li>
                         <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Jobs" asp-action="Index">Jobs</a></li>
-                        <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="CVs" asp-action="Index">Import CV</a></li>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Jobseeker"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="CVs" asp-action="Index">Import CV</a></li>
+                        }
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Adminstator"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Category edit</a></li>
+                        }
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Employer"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="JobCVs" asp-action="Index">Manager</a></li>
+                        }
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Jobseeker"))
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-controller="JobCVs" asp-action="Index">Check CVs</a></li>
+                        }
                     </ul>
                 </div>
             </div>

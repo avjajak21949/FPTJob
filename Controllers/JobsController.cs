@@ -25,15 +25,49 @@ namespace FPTJob.Controllers
         // GET: Jobs
         public async Task<IActionResult> Index()
         {
-            // Get the current logged-in user
+            // Get the current logged-in user ID
             var currentUserId = _userManager.GetUserId(User);
 
-            // Retrieve all jobs
-            var jobs = await _context.Job.Include(j => j.Category).ToListAsync();
+            // Retrieve jobs based on the user's role
+            List<Job> jobs;
+
+            if (User.IsInRole("Adminstator"))
+            {
+                // Admin: Retrieve all jobs (approved and pending)
+                jobs = await _context.Job
+                    .Include(j => j.Category)
+                    .ToListAsync();
+            }
+            else if (User.IsInRole("Employer"))
+            {
+                // Employer: Retrieve only the jobs created by the logged-in employer
+                jobs = await _context.Job
+                    .Where(j => j.EmployerId == currentUserId)
+                    .Include(j => j.Category)
+                    .ToListAsync();
+            }
+            else if (User.IsInRole("Jobseeker"))
+            {
+                // Jobseeker: Retrieve only the approved jobs
+                jobs = await _context.Job
+                    .Where(j => j.IsApproved)  // Only approved jobs
+                    .Include(j => j.Category)
+                    .ToListAsync();
+            }
+            else
+            {
+                // If the user does not fit into any role, return an empty list (or handle accordingly)
+                jobs = new List<Job>();
+            }
 
             // Retrieve all CVs associated with the logged-in user (ApplicantId)
-            var cvs = await _context.CV.Where(cv => cv.ApplicantId == currentUserId).ToListAsync();
+            var cvs = await _context.CV
+                .Where(cv => cv.ApplicantId == currentUserId)
+                .ToListAsync();
+
+            // Pass the CVs to the view via ViewBag
             ViewBag.CVs = cvs;
+
             return View(jobs);
         }
 
@@ -209,7 +243,6 @@ namespace FPTJob.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Jobseeker")]
         // Reject a job (delete it)
         [HttpPost]
         public async Task<IActionResult> RejectJob(int jobId)
@@ -222,6 +255,8 @@ namespace FPTJob.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        [Authorize(Roles = "Jobseeker")]
 
         [HttpPost]
         public async Task<IActionResult> ApplyForJob(int jobId, int cvId)
@@ -249,8 +284,146 @@ namespace FPTJob.Controllers
             await _context.SaveChangesAsync();
 
             // Optionally, trả về file CV hoặc thông báo apply thành công
-            return Ok("Đã apply công việc thành công!");
+            return RedirectToAction(nameof(Index));
+        }
+        //search function
+        public IActionResult SearchProduct(string keyword)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+
+            // Search jobs based on the user's role
+            List<Job> jobs;
+
+            if (User.IsInRole("Adminstator"))
+            {
+                // Admin: Retrieve all jobs matching the keyword
+                jobs = _context.Job
+                    .Where(j => j.Title.Contains(keyword))
+                    .Include(j => j.Category)
+                    .ToList();
+            }
+            else if (User.IsInRole("Employer"))
+            {
+                // Employer: Retrieve only jobs created by the logged-in employer matching the keyword
+                jobs = _context.Job
+                    .Where(j => j.Title.Contains(keyword) && j.EmployerId == currentUserId)
+                    .Include(j => j.Category)
+                    .ToList();
+            }
+            else if (User.IsInRole("Jobseeker"))
+            {
+                // Jobseeker: Retrieve only approved jobs matching the keyword
+                jobs = _context.Job
+                    .Where(j => j.Title.Contains(keyword) && j.IsApproved)
+                    .Include(j => j.Category)
+                    .ToList();
+            }
+            else
+            {
+                // Default: Return an empty list
+                jobs = new List<Job>();
+            }
+
+            // Retrieve CVs of the logged-in user
+            var cvs = _context.CV.Where(cv => cv.ApplicantId == currentUserId).ToList();
+            ViewBag.CVs = cvs;
+
+            return View("Index", jobs);
         }
 
+
+        //sort functions
+        public IActionResult SortByPriceAsc()
+        {
+            var currentUserId = _userManager.GetUserId(User);
+
+            // Sort jobs based on the user's role
+            List<Job> jobs;
+
+            if (User.IsInRole("Adminstator"))
+            {
+                // Admin: Sort all jobs by salary in ascending order
+                jobs = _context.Job
+                    .OrderBy(j => j.Salary)
+                    .Include(j => j.Category)
+                    .ToList();
+            }
+            else if (User.IsInRole("Employer"))
+            {
+                // Employer: Sort only the jobs created by the logged-in employer by salary
+                jobs = _context.Job
+                    .Where(j => j.EmployerId == currentUserId)
+                    .OrderBy(j => j.Salary)
+                    .Include(j => j.Category)
+                    .ToList();
+            }
+            else if (User.IsInRole("Jobseeker"))
+            {
+                // Jobseeker: Sort only approved jobs by salary in ascending order
+                jobs = _context.Job
+                    .Where(j => j.IsApproved)
+                    .OrderBy(j => j.Salary)
+                    .Include(j => j.Category)
+                    .ToList();
+            }
+            else
+            {
+                // Default: Return an empty list
+                jobs = new List<Job>();
+            }
+
+            // Retrieve CVs of the logged-in user
+            var cvs = _context.CV.Where(cv => cv.ApplicantId == currentUserId).ToList();
+            ViewBag.CVs = cvs;
+
+            return View("Index", jobs);
+        }
+
+
+        public IActionResult SortByPriceDesc()
+        {
+            var currentUserId = _userManager.GetUserId(User);
+
+            // Sort jobs based on the user's role
+            List<Job> jobs;
+
+            if (User.IsInRole("Adminstator"))
+            {
+                // Admin: Sort all jobs by salary in descending order
+                jobs = _context.Job
+                    .OrderByDescending(j => j.Salary)
+                    .Include(j => j.Category)
+                    .ToList();
+            }
+            else if (User.IsInRole("Employer"))
+            {
+                // Employer: Sort only the jobs created by the logged-in employer by salary
+                jobs = _context.Job
+                    .Where(j => j.EmployerId == currentUserId)
+                    .OrderByDescending(j => j.Salary)
+                    .Include(j => j.Category)
+                    .ToList();
+            }
+            else if (User.IsInRole("Jobseeker"))
+            {
+                // Jobseeker: Sort only approved jobs by salary in descending order
+                jobs = _context.Job
+                    .Where(j => j.IsApproved)
+                    .OrderByDescending(j => j.Salary)
+                    .Include(j => j.Category)
+                    .ToList();
+            }
+            else
+            {
+                // Default: Return an empty list
+                jobs = new List<Job>();
+            }
+
+            // Retrieve CVs of the logged-in user
+            var cvs = _context.CV.Where(cv => cv.ApplicantId == currentUserId).ToList();
+            ViewBag.CVs = cvs;
+
+            return View("Index", jobs);
+        }
     }
 }

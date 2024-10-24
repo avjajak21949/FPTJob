@@ -6,28 +6,24 @@
 
 <div class="container mt-5">
     <h1 class="text-center display-4 mb-4">Job Management</h1>
-
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Employer"))
+                {
     <div class="text-right mb-4">
         <a asp-action="Create" class="btn btn-primary btn-lg shadow-lg">Create New Job</a>
     </div>
-
+                }
     <!-- Search Bar -->
     <div class="mb-4">
-        <form method="get" action="@Url.Action("Index")" class="form-inline">
-            <input type="text" name="searchString" class="form-control" placeholder="Search jobs..." />
+        <form method="get" action="@Url.Action("SearchProduct", "Jobs")" class="form-inline">
+            <input type="text" name="keyword" class="form-control" placeholder="Search jobs..." />
             <button type="submit" class="btn btn-secondary ml-2">Search</button>
         </form>
     </div>
 
     <!-- Sort By -->
-    <div class="mb-4">
-        <label for="sortOptions" class="mr-2">Sort by:</label>
-        <select id="sortOptions" name="sortOrder" class="form-control d-inline" onchange="this.form.submit()">
-            <option value="">Select...</option>
-            <option value="title">Title</option>
-            <option value="salary">Salary</option>
-            <option value="location">Location</option>
-        </select>
+    <div class="col">
+        <a method="get" class="btn btn-primary" asp-controller="Jobs" asp-action="SortByPriceAsc">Sort By Price Ascending</a>
+        <a method="get" class="btn btn-danger" asp-controller="Jobs" asp-action="SortByPriceDesc">Sort By Price Descending</a>
     </div>
 
     <!-- Card layout for job management -->
@@ -45,18 +41,31 @@
                         <p><strong>Location: </strong>@item.Place</p>
                         <p><strong>Time: </strong>@item.Time</p>
                         <p><strong>Category: </strong>@item.Category.Name</p>
-                        <p>
-                            <strong>Status: </strong>
-                            @if (!item.IsApproved)
-                            {
-                                <span class="badge badge-warning">Pending</span>
-                            }
-                            else
-                            {
-                                <span class="badge badge-success">Approved</span>
-                            }
-                        </p>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Employer"))
+                        {
+                            <p>
+                                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                            </p>
+                        }
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Adminstator"))
+                        {
+                            <p>
+                                <strong>Status: </strong>
+                                @if (!item.IsApproved)
+                                {
+                                    <span class="badge badge-warning">Pending</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-success">Approved</span>
+                                }
+                            </p>
+                        }
                     </div>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Adminstator"))
+                    {
                     <div class="card-footer text-center">
                         <form method="post" action="@Url.Action("ApproveJob", "Jobs")" class="d-inline">
                             <input type="hidden" name="jobId" value="@item.Id" />
@@ -67,6 +76,8 @@
                             <button type="submit" class="btn btn-danger btn-sm">Decline</button>
                         </form>
                     </div>
+                    }
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Jobseeker")){
                     <div>
                         <form asp-action="ApplyForJob" method="post">
                             <input type="hidden" name="jobId" value="@item.Id" />
@@ -83,6 +94,7 @@
                             <button type="submit" class="btn btn-primary">Apply</button>
                         </form>
                     </div>
+                    }
                 </div>
             </div>
         }

@@ -26,12 +26,38 @@ namespace FPTJob.Controllers
         // GET: JobCVs
         public async Task<IActionResult> Index()
         {
-            var jobCvs = _context.JobCV
-                     .Include(j => j.Job)  // Bao gồm Job
-                     .Include(c => c.CV)   // Bao gồm CV
-                     .ToList();
+            // Get the current logged-in user ID
+            var currentUserId = _userManager.GetUserId(User);
 
-            return View(await _context.JobCV.ToListAsync());
+            // List to hold the filtered JobCVs
+            List<JobCV> jobcv;
+
+            if (User.IsInRole("Employer"))
+            {
+                // Employer: Retrieve only the jobs created by the logged-in employer
+                jobcv = await _context.JobCV
+                    .Where(j => j.Job.EmployerId == currentUserId)  // Filter by EmployerId
+                    .Include(j => j.Job)                            // Include related Job
+                    .Include(j => j.CV)                             // Include related CV
+                    .ToListAsync();
+            }
+            else if (User.IsInRole("Jobseeker"))
+            {
+                // Jobseeker: Retrieve only the jobs applied for by the logged-in user (Jobseeker)
+                jobcv = await _context.JobCV
+                    .Where(j => j.CV.ApplicantId == currentUserId)  // Filter by ApplicantId
+                    .Include(j => j.Job)                            // Include related Job
+                                        .Include(j => j.CV)                             // Include related CV
+                    .ToListAsync();
+            }
+            else
+            {
+                // If the user is neither Employer nor Jobseeker, return an empty list
+                jobcv = new List<JobCV>();
+            }
+
+            // Pass the filtered jobcv list to the view
+            return View(jobcv);
         }
 
         // GET: JobCVs/Details/5

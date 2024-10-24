@@ -12,24 +12,37 @@
             <th>Job Title</th>
             <th>Applicant</th>
             <th>Pending</th>
-            <th>Action</th>
+                            @if (User.Identity.IsAuthenticated && User.IsInRole("Employer"))
+            {
+                <th>Action</th>
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Job.Title</td>
                 <td>
-                    <embed src="@item.CV.file" type="application/pdf" width="200" height="200" />
-                    <a href="@item.CV.file" target="_blank">View PDF</a>
+                    @if (item.Job != null)
+                    {
+                        @item.Job.Title
+                    }
+                    else
+                    {
+                    }
                 </td>
                 <td>
-                    @if (item.IsApproved == null)
+                    @if(item.CV != null)
                     {
-                        <span class="text-warning">Chưa duyệt</span>
+                        <embed src="@item.CV.file" type="application/pdf" width="200" height="200" />
+                        <a href="@item.CV.file" target="_blank">View PDF</a>
                     }
-                    else if (item.IsApproved == true)
+                    else
+                    {
+                    }
+                </td>
+                <td>
+                    @if (item.IsApproved == true)
                     {
                         <span class="text-success">Success</span>
                     }
@@ -38,7 +51,9 @@
                         <span class="text-danger">Pending</span>
                     }
                 </td>
-                <td>
+                @if (User.Identity.IsAuthenticated && User.IsInRole("Employer"))
+                {
+                    <td>
                         <form method="post" asp-action="ApproveCV" asp-route-jobCVID="@item.JobCVID">
                             <button type="submit" class="btn btn-success">Chấp nhận</button>
                         </form>
@@ -46,6 +61,7 @@
                             <button type="submit" class="btn btn-danger">Từ chối</button>
                         </form>
                 </td>
+                }
             </tr>
         }
     </tbody>

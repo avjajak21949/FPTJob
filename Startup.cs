@@ -96,7 +96,7 @@ namespace FPTJob
                     // Tạo tài khoản admin
                     var newAdmin = new IdentityUser
                     {
-                        Id = "0",
+                        Id = "+a6s2da+s62da+s62da+s62da+s6d2as+6d2s+3fdg2+",
                         UserName = adminEmail,
                         Email = adminEmail,
                         NormalizedUserName = adminEmail.ToUpper(),
@@ -110,7 +110,7 @@ namespace FPTJob
                     if (createAdminResult.Succeeded)
                     {
                         // Gán vai trò admin cho tài khoản
-                        await userManager.AddToRoleAsync(newAdmin, "Adminstrator");
+                        await userManager.AddToRoleAsync(newAdmin, "Adminstator");
                     }
                     else
                     {
